@@ -74,4 +74,4 @@ setup-simple-ann: ## setup simple ann project
 simple-ann: ## executes simple ann
 	@cd $(SIMPLE_ANN) && \
 		. venv/bin/activate && \
-		./simple-ann.py
+		./simple-ann-tensor.py
