@@ -69,3 +69,9 @@ setup-simple-ann: ## setup simple ann project
 		pip install --upgrade pip && \
 		pip install -r requirements.txt && \
 		./tf-test.py
+
+.PHONY: simple-ann
+simple-ann: ## executes simple ann
+	@cd $(SIMPLE_ANN) && \
+		. venv/bin/activate && \
+		./simple-ann.py
