@@ -46,6 +46,15 @@ Install cuDNN: `make setup-cudnn`
 
 help: `make`
 
+### Simple ANN
+
+> Assumes you have met os level and global python (we are using ubuntu python 3.10)
+
+Setup: `make setup-simple-ann`
+Execute: `make simple-ann`
+
+### Portfolio Project
+
 Setup Portfolio Project: `make pp`
 
 Execute Portfolio Project: `make pp`

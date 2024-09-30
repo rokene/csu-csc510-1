@@ -2,7 +2,7 @@
 
 import numpy as np
 
-# --- Activation Functions ---
+# Activation Functions
 
 def sigmoid(x):
     """Sigmoid activation function."""
@@ -12,7 +12,7 @@ def sigmoid_derivative(x):
     """Derivative of the sigmoid function."""
     return x * (1 - x)
 
-# --- Dataset Preparation ---
+# Dataset Preparation
 
 def create_dataset(series, window_size):
     """
@@ -33,7 +33,6 @@ def create_dataset(series, window_size):
         y.append(series[i+window_size])
     return np.array(X), np.array(y)
 
-# --- Neural Network Structure ---
 
 class NeuralNetwork:
     def __init__(self, input_size, hidden_size, output_size, learning_rate=0.1):
@@ -52,7 +51,7 @@ class NeuralNetwork:
         self.b1 = np.random.randn(1, hidden_size)
         self.W2 = np.random.randn(hidden_size, output_size)
         self.b2 = np.random.randn(1, output_size)
-    
+
     def forward(self, X):
         """
         Performs forward propagation.
@@ -68,7 +67,7 @@ class NeuralNetwork:
         self.z2 = np.dot(self.a1, self.W2) + self.b2
         y_pred = self.z2  # Linear activation for regression
         return y_pred
-    
+
     def compute_loss(self, y_pred, y):
         """
         Computes Mean Squared Error loss.
@@ -82,7 +81,7 @@ class NeuralNetwork:
         """
         loss = np.mean((y_pred - y) ** 2)
         return loss
-    
+
     def backward(self, X, y, y_pred):
         """
         Performs backward propagation and updates weights and biases.
@@ -95,19 +94,19 @@ class NeuralNetwork:
         m = y.shape[0]  # Number of samples
 
         # Compute the gradient of loss w.r.t y_pred
-        d_loss_y_pred = 2 * (y_pred - y) / m  # Shape: (m, 1)
-        
+        d_loss_y_pred = 2 * (y_pred - y) / m  # Shape: (m,1)
+
         # Gradients for W2 and b2
-        d_z2 = d_loss_y_pred  # Since y_pred = z2
-        d_W2 = np.dot(self.a1.T, d_z2)  # Shape: (hidden_size, output_size)
-        d_b2 = np.sum(d_z2, axis=0, keepdims=True)  # Shape: (1, output_size)
-        
+        d_z2 = d_loss_y_pred  # Shape: (m,1)
+        d_W2 = np.dot(self.a1.T, d_z2)  # Shape: (hidden_size,1)
+        d_b2 = np.sum(d_z2, axis=0, keepdims=True)  # Shape: (1,1)
+
         # Gradients for W1 and b1
         d_a1 = np.dot(d_z2, self.W2.T)  # Shape: (m, hidden_size)
         d_z1 = d_a1 * sigmoid_derivative(self.a1)  # Shape: (m, hidden_size)
         d_W1 = np.dot(X.T, d_z1)  # Shape: (input_size, hidden_size)
         d_b1 = np.sum(d_z1, axis=0, keepdims=True)  # Shape: (1, hidden_size)
-        
+
         # Update weights and biases
         self.W2 -= self.learning_rate * d_W2
         self.b2 -= self.learning_rate * d_b2
@@ -152,52 +151,51 @@ class NeuralNetwork:
         predicted_num = y_pred[0][0]
         return predicted_num
 
-# --- Main Execution ---
 
 def main():
     # Define the series
     series = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    
+
     # Create input-output pairs
     window_size = 2
     X, y = create_dataset(series, window_size)
-    
+
     # Normalize the data
     X = X / float(np.max(series))
-    y = y / float(np.max(series))
-    
+    y = y.reshape(-1, 1) / float(np.max(series))  # Reshape y to (m,1)
+
     print("Input (X):")
     print(X)
     print("\nOutput (y):")
     print(y)
-    
+
     # Initialize the Neural Network
     input_size = window_size    # 2
     hidden_size = 2             # Number of neurons in hidden layer
     output_size = 1             # 1 (predicting the next number)
     learning_rate = 0.1
     epochs = 1000
-    
+
     nn = NeuralNetwork(input_size, hidden_size, output_size, learning_rate)
     
     # Train the Neural Network
     nn.train(X, y, epochs=epochs, print_loss=True)
-    
+
     # Testing the Neural Network
     test_input = np.array([[9, 10]]) / float(np.max(series))  # Normalize
     predicted_output = nn.predict(test_input)
     predicted_number = predicted_output * float(np.max(series))  # Denormalize
-    
+
     print("\nTesting the Neural Network:")
     print(f"Input: [9, 10]")
     print(f"Predicted Output: {predicted_number:.2f} (Expected: 11)")
-    
-    # --- User Input Functionality ---
-    
+
+    # User Input Functionality
+
     while True:
         user_input = input("\nEnter a sequence of two numbers separated by a comma (e.g., 5,6), or type 'exit' to quit: ")
         if user_input.lower() == 'exit':
-            print("Exiting the program. Goodbye!")
+            print("Goodbye!")
             break
         try:
             input_values = user_input.split(',')

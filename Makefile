@@ -37,8 +37,8 @@ pp: ## executes portfolio project
 .PHONY: setup-python
 
 setup-os: ## setup os dependencies
-	@echo "installing python 3.10 depends"
-	@sudo apt update && sudo apt upgrade -y && sudo apt install -y python3.10-venv
+	@echo "installing os tools"
+	@sudo apt update && sudo apt upgrade -y && sudo apt install -y python3.10-venv make
 
 .PHONY: setup-cuda-toolkit
 # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=WSL-Ubuntu&target_version=2.0&target_type=deb_local
@@ -74,4 +74,4 @@ setup-simple-ann: ## setup simple ann project
 simple-ann: ## executes simple ann
 	@cd $(SIMPLE_ANN) && \
 		. venv/bin/activate && \
-		./simple-ann-tensor.py
+		./simple-ann-numpy.py
