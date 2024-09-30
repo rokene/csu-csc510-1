@@ -67,5 +67,5 @@ setup-simple-ann: ## setup simple ann project
 	@cd $(SIMPLE_ANN) && python3 -m venv venv && \
 		. venv/bin/activate && \
 		pip install --upgrade pip && \
-		pip install tensorflow==2.12.0 && \
+		pip install -r requirements.txt && \
 		./tf-test.py
