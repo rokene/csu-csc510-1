@@ -34,9 +34,37 @@ pp: ## executes portfolio project
 	@$(PP)/$(PP_APP)
 	@echo "pp: completed portfolio project"
 
+.PHONY: setup-python
+
+setup-os: ## setup os dependencies
+	@echo "installing python 3.10 depends"
+	@sudo apt update && sudo apt upgrade -y && sudo apt install -y python3.10-venv
+
+.PHONY: setup-cuda-toolkit
+# https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=WSL-Ubuntu&target_version=2.0&target_type=deb_local
+setup-cuda-toolkit: ## setup cuda toolkit
+	@echo "installing cuda toolkit 12.6.1"
+	@wget https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.35.03_linux.run && \
+		sudo sh cuda_12.6.1_560.35.03_linux.run; \
+		rm cuda_12.6.1_560.35.03_linux.run
+	@nvcc --version
+
+.PHONY: setup-cudnn
+# https://developer.nvidia.com/rdp/cudnn-archive
+setup-cudnn: ## setup cudnn
+	@echo "installing cudnn-linux-x86_64-8.9.7.29_cuda12"
+	@sudo apt install -y libcusolver-12 libcusparse-12 libcublas-12
+	@cd supporting-artifacts && \
+		tar -xf cudnn-linux-x86_64-8.9.7.29_cuda12-archive.tar.xz && \
+		cd cudnn-linux-x86_64-8.9.7.29_cuda12-archive && \
+		sudo cp include/cudnn*.h /usr/local/cuda-12.6/include/ && \
+		sudo cp -P lib/libcudnn* /usr/local/cuda-12.6/lib64/ && \
+		sudo chmod a+r /usr/local/cuda-12.6/include/cudnn*.h /usr/local/cuda-12.6/lib64/libcudnn*
+	@cat /usr/local/cuda-12.6/include/cudnn_version.h | grep CUDNN_MAJOR -A 2
+
 .PHONY: setup-simple-ann
 setup-simple-ann: ## setup simple ann project
-	@cd $(SIMPLE_ANN) && python -m venv venv && \
+	@cd $(SIMPLE_ANN) && python3 -m venv venv && \
 		. venv/bin/activate && \
 		pip install --upgrade pip && \
 		pip install tensorflow==2.12.0 && \
