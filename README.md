@@ -53,6 +53,10 @@ help: `make`
 Setup: `make setup-simple-ann`
 Execute: `make simple-ann`
 
+### Informed Search - Towers of Hanoi
+
+Execute: `make towers-hanoi`
+
 ### Portfolio Project
 
 Setup Portfolio Project: `make pp`

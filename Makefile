@@ -13,6 +13,8 @@ PP_TRAINING_TEST_DATA=trainingandtestdata.zip
 
 SIMPLE_ANN=simple-ann
 
+INFORMED_SEARCH=informed-search
+
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*' $(MAKEFILE_LIST) | sort
@@ -75,3 +77,8 @@ simple-ann: ## executes simple ann
 	@cd $(SIMPLE_ANN) && \
 		. venv/bin/activate && \
 		./simple-ann-numpy.py
+
+.PHONY: towers-hanoi
+towers-hanoi: ## executes informed search towers of hanoi
+	@cd $(INFORMED_SEARCH) && \
+		./towers-hanoi.py
