@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import heapq  # Import heapq for priority queue implementation
+import heapq
 
 class HanoiState:
     def __init__(self, towers, parent=None, move=None, depth=0, cost=0):
