@@ -42,7 +42,7 @@ Install cuda toolkit: `make setup-cuda-toolkit`
 
 Install cuDNN: `make setup-cudnn`
 
-## USAGE
+## Usage
 
 help: `make`
 
@@ -51,7 +51,14 @@ help: `make`
 > Assumes you have met os level and global python (we are using ubuntu python 3.10)
 
 Setup: `make setup-simple-ann`
+
 Execute: `make simple-ann`
+
+### Naive Bayes Classifier
+
+Setup: `setup-naive-bayes-classifier`
+
+Execute: `naive-bayes-classifier`
 
 ### Informed Search - Towers of Hanoi
 

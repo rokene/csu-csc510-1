@@ -15,6 +15,8 @@ SIMPLE_ANN=simple-ann
 
 INFORMED_SEARCH=informed-search
 
+NAIVE_BAYES=naive-bayes-classifier
+
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*' $(MAKEFILE_LIST) | sort
@@ -82,3 +84,16 @@ simple-ann: ## executes simple ann
 towers-hanoi: ## executes informed search towers of hanoi
 	@cd $(INFORMED_SEARCH) && \
 		./towers-hanoi.py
+
+.PHONY: setup-naive-bayes-classifier
+setup-naive-bayes-classifier: ## setup the naive bayes project
+	@cd $(NAIVE_BAYES) && python3 -m venv venv && \
+		. venv/bin/activate && \
+		pip install --upgrade pip && \
+		pip install -r requirements.txt
+
+.PHONY: naive-bayes-classifier
+naive-bayes-classifier: ## executes naive-bayes-classifier
+	@cd $(NAIVE_BAYES) && \
+		. venv/bin/activate && \
+		./classifier.py
