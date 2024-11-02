@@ -1,3 +1,4 @@
 *.log
 *.pkl
 *.h5
+*.keras

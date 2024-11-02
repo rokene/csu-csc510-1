@@ -23,6 +23,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
 # Deep Learning libraries
+import tensorflow as tf
+print(tf.__version__)
+
 from tensorflow import keras
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -210,7 +213,7 @@ def ml_model_training_evaluation(X_train_tfidf, X_test_tfidf, y_train_tfidf, y_t
     # Evaluate the model
     logger.info("\nLogistic Regression Performance:")
     logger.info(classification_report(y_test_tfidf, y_pred_tfidf))
-    logger.info("Accuracy:", accuracy_score(y_test_tfidf, y_pred_tfidf))
+    logger.info(f"Accuracy: {accuracy_score(y_test_tfidf, y_pred_tfidf)}")
     return lr_model
 
 # Neural Network Model (LSTM)
@@ -239,7 +242,7 @@ def nn_model_training_evaluation(
     # Evaluate the model
     score, acc = model.evaluate(X_test_seq, y_test_seq, batch_size=256)
     logger.info("\nLSTM Model Performance:")
-    logger.info("Test accuracy:", acc)
+    logger.info(f"Test accuracy: {acc}")
     return model
 
 
@@ -249,20 +252,20 @@ def save_artifacts(lr_model, tfidf_vectorizer, nn_model, nn_tokenizer):
     joblib.dump(tfidf_vectorizer, 'tfidf_vectorizer.pkl')
 
     # Save the LSTM model and tokenizer
-    nn_model.save('lstm_model.h5')
+    nn_model.save('lstm_model.keras')
     joblib.dump(nn_tokenizer, 'tokenizer.pkl')
 
 
 def init_models():
     if not config.force_regenerate_models or (
         os.path.exists('lr_model.pkl') and
-        os.path.exists('lstm_model.h5') and
+        os.path.exists('lstm_model.keras') and
         os.path.exists('tfidf_vectorizer.pkl') and
         os.path.exists('tokenizer.pkl')):
             logger.info("Loading models, vectorizers, tokenizers from file")
             lr_model = joblib.load('lr_model.pkl')
             tfidf_vectorizer = joblib.load('tfidf_vectorizer.pkl')
-            nn_lstm_model = keras.models.load_model('lstm_model.h5')
+            nn_lstm_model = keras.models.load_model('lstm_model.keras')
             nn_model_tokenizer = joblib.load('tokenizer.pkl')
     else:
         logger.info("Generating models")
