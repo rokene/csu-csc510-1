@@ -30,12 +30,24 @@ pp-setup: ## setup dependencies and precursors for portfolio project
 	@git lfs install
 	@git pull
 	@git lfs pull
-	@unzip $(PP_DATA)/$(PP_TRAINING_TEST_DATA) -d $(PP_DATA) && chmod 644 -R $(PP_DATA)
+	@unzip $(PP_DATA)/$(PP_TRAINING_TEST_DATA) -d $(PP_DATA) && \
+		sudo chown -R rokene:rokene $(PP_DATA) && \
+		sudo chmod -R u+rwX $(PP_DATA)
+
+.PHONY: pp-test
+pp-test: ## executes test portfolio project
+	@cd $(PP) && \
+		. venv/bin/activate && \
+		nvidia-smi && \
+		nvcc --version
 
 .PHONY: pp
 pp: ## executes portfolio project
+	@echo "checking if gpu libs are available"; make pp-test
 	@echo "pp: starting portfolio project"
-	@. venv/bin/activate && $(PP)/$(PP_APP)
+	@cd $(PP) && \
+		. venv/bin/activate && \
+		$(PP)/$(PP_APP)
 	@echo "pp: completed portfolio project"
 
 .PHONY: setup-os
