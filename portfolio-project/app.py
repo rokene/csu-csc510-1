@@ -36,20 +36,34 @@ from tensorflow.keras.utils import to_categorical
 # Suppress TensorFlow warnings
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-# CONSTANTS
-
-# FUNCTIONS
-
-# Download NLTK data files
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('punkt')
 
-# Initialize lemmatizer and stopwords
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
+
 logger = None
 
+# CONSTANTS
+
+logo = """
+███████╗███████╗███╗   ██╗████████╗██╗███╗   ███╗███████╗███╗   ██╗████████╗
+██╔════╝██╔════╝████╗  ██║╚══██╔══╝██║████╗ ████║██╔════╝████╗  ██║╚══██╔══╝
+███████╗█████╗  ██╔██╗ ██║   ██║   ██║██╔████╔██║█████╗  ██╔██╗ ██║   ██║   
+╚════██║██╔══╝  ██║╚██╗██║   ██║   ██║██║╚██╔╝██║██╔══╝  ██║╚██╗██║   ██║   
+███████║███████╗██║ ╚████║   ██║   ██║██║ ╚═╝ ██║███████╗██║ ╚████║   ██║   
+╚══════╝╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚═╝╚═╝     ╚═╝╚══════╝╚═╝  ╚═══╝   ╚═╝   
+                                                                            
+ █████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗███████╗███████╗██████╗             
+██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝╚══███╔╝██╔════╝██╔══██╗            
+███████║██╔██╗ ██║███████║██║   ╚████╔╝   ███╔╝ █████╗  ██████╔╝            
+██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝   ███╔╝  ██╔══╝  ██╔══██╗            
+██║  ██║██║ ╚████║██║  ██║███████╗██║   ███████╗███████╗██║  ██║            
+╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚══════╝╚═╝  ╚═╝            
+"""
+
+# FUNCTIONS
 
 def setup_logging(log_file='app.log'):
     # Create a custom logger
@@ -117,38 +131,6 @@ def load_data():
     df['target'] = df['target'].replace(4, 1)
 
     return df
-
-
-def sentiment_analysis_cli(lr_model, tfidf_vectorizer, tokenizer, nn_model, max_sequence_length):
-    print("\nSentiment Analysis CLI")
-    print("Type 'exit' to quit")
-    while True:
-        try:
-            user_input = input("\nEnter a tweet or message: ")
-            if user_input.lower() == 'exit':
-                logger.info("Exiting...")
-                break
-            else:
-                # Preprocess input
-                clean_input = preprocess_text(user_input)
-
-                # Logistic Regression Prediction
-                input_tfidf = tfidf_vectorizer.transform([clean_input])
-                lr_prediction = lr_model.predict(input_tfidf)[0]
-                lr_sentiment = 'Positive' if lr_prediction == 1 else 'Negative'
-
-                # LSTM Prediction
-                input_seq = tokenizer.texts_to_sequences([clean_input])
-                input_seq = pad_sequences(input_seq, maxlen=max_sequence_length)
-                lstm_prediction = nn_model.predict(input_seq)[0][0]
-                lstm_sentiment = 'Positive' if lstm_prediction >= 0.5 else 'Negative'
-                lstm_score = lstm_prediction
-
-                # Display results
-                print(f"\nLogistic Regression Sentiment: {lr_sentiment}")
-                print(f"LSTM Model Sentiment: {lstm_sentiment} (Confidence: {lstm_score:.2f})")
-        except Exception as e:
-            logger.error(f"An error occurred: {e}")
 
 
 # Data Preprocessing
@@ -257,7 +239,20 @@ def save_artifacts(lr_model, tfidf_vectorizer, nn_model, nn_tokenizer):
 
 
 def init_models():
-    if not config.force_regenerate_models or (
+    ml_model_random_state = 42
+    ml_max_features = 5000
+    ml_test_size=0.2
+    ml_max_iteration=1000
+
+    nn_model_max_num_words = 5000
+    nn_model_max_sequence_length = 100
+    nn_max_test_size = 0.2
+    nn_random_state = 42
+    nn_dropout = 0.2
+    nn_recurrent_dropout = 0.2
+    nn_output_dim = 128
+
+    if not config.force_regenerate_models and (
         os.path.exists('lr_model.pkl') and
         os.path.exists('lstm_model.keras') and
         os.path.exists('tfidf_vectorizer.pkl') and
@@ -282,11 +277,6 @@ def init_models():
 
         preprocess_data(df)
 
-        ml_model_random_state = 42
-        ml_max_features = 5000
-        ml_test_size=0.2
-        ml_max_iteration=1000
-
         X_train_tfidf,X_test_tfidf, y_train_tfidf, y_test_tfidf, tfidf_vectorizer = ml_model_idf_vectorization(
             df,
             ml_max_features,
@@ -299,14 +289,6 @@ def init_models():
             y_train_tfidf,
             y_test_tfidf,
             ml_max_iteration)
-
-        nn_model_max_num_words = 5000
-        nn_model_max_sequence_length = 100
-        nn_max_test_size = 0.2
-        nn_random_state = 42
-        nn_dropout = 0.2
-        nn_recurrent_dropout = 0.2
-        nn_output_dim = 128
 
         X_train_seq, X_test_seq, y_train_seq, y_test_seq, nn_model_tokenizer = nn_model_tokenization_padding(
             df,
@@ -333,6 +315,44 @@ def init_models():
             nn_model_tokenizer)
 
     return lr_model, tfidf_vectorizer, nn_model_tokenizer, nn_lstm_model, nn_model_max_sequence_length
+
+
+def sentiment_analysis_cli(lr_model, tfidf_vectorizer, tokenizer, nn_model, max_sequence_length):
+    global logo
+    print(f"{logo}")
+    print("Type 'exit' to quit")
+    while True:
+        try:
+            user_input = input("\nEnter a tweet or message: ")
+            if user_input.lower() == 'exit':
+                logger.info("Exiting...")
+                break
+            else:
+                # Preprocess input
+                clean_input = preprocess_text(user_input)
+
+                # Logistic Regression Prediction
+                input_tfidf = tfidf_vectorizer.transform([clean_input])
+                lr_prob = lr_model.predict_proba(input_tfidf)[0][1]  # Probability of positive class
+                lr_sentiment = 'Positive' if lr_prob >= 0.5 else 'Negative'
+
+                # LSTM Prediction
+                input_seq = tokenizer.texts_to_sequences([clean_input])
+                input_seq = pad_sequences(input_seq, maxlen=max_sequence_length)
+                lstm_prob = nn_model.predict(input_seq)[0][0]  # Probability from sigmoid output
+                lstm_sentiment = 'Positive' if lstm_prob >= 0.5 else 'Negative'
+
+                # Average the probabilities
+                avg_prob = (lr_prob + lstm_prob) / 2
+                overall_sentiment = 'Positive' if avg_prob >= 0.5 else 'Negative'
+
+                # Display results
+                print(f"\nLogistic Regression Sentiment: {lr_sentiment} (Confidence: {lr_prob:.2f})")
+                print(f"LSTM Model Sentiment: {lstm_sentiment} (Confidence: {lstm_prob:.2f})")
+                print(f"Overall Sentiment: {overall_sentiment} (Average Confidence: {avg_prob:.2f})")
+
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
 
 
 def main():
