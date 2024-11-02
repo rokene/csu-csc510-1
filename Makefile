@@ -2,9 +2,6 @@
 
 CURRENT_DIR := $(CURDIR)
 
-# MODULE1=$(CURRENT_DIR)/module-1
-# MODULE1_CRITICAL_THINKING=$(MODULE1)/critical-thinking
-
 PP=$(CURRENT_DIR)/portfolio-project
 PP_DATA=$(PP)/data
 
@@ -21,31 +18,33 @@ NAIVE_BAYES=naive-bayes-classifier
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*' $(MAKEFILE_LIST) | sort
 
-# .PHONY: m1
-# m1: ## executes module 1 critical thinking
-# 	@echo "executing module 1 critical thinking ..."
-# 	@cd $(MODULE1_CRITICAL_THINKING) && ./machine-info.sh
-# 	@echo "completed module 1 critical thinking."
-
 .PHONY: pp-setup
 pp-setup: ## setup dependencies and precursors for portfolio project
-	@pip install pandas numpy nltk scikit-learn
+	@echo "pp: setting up portfolio project virtual env"
+	@cd $(PP) && \
+		python3 -m venv venv && \
+		. venv/bin/activate && \
+		pip install --upgrade pip && \
+		pip install -r requirements.txt
+	@echo "pp: setting up portfolio project data"
+	@git lfs install
+	@git pull
+	@git lfs pull
 	@unzip $(PP_DATA)/$(PP_TRAINING_TEST_DATA) -d $(PP_DATA) && chmod 644 -R $(PP_DATA)
 
 .PHONY: pp
 pp: ## executes portfolio project
 	@echo "pp: starting portfolio project"
-	@$(PP)/$(PP_APP)
+	@. venv/bin/activate && $(PP)/$(PP_APP)
 	@echo "pp: completed portfolio project"
 
-.PHONY: setup-python
-
+.PHONY: setup-os
 setup-os: ## setup os dependencies
 	@echo "installing os tools"
 	@sudo apt update && sudo apt upgrade -y && sudo apt install -y python3.10-venv make
 
-.PHONY: setup-cuda-toolkit
 # https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=WSL-Ubuntu&target_version=2.0&target_type=deb_local
+.PHONY: setup-cuda-toolkit
 setup-cuda-toolkit: ## setup cuda toolkit
 	@echo "installing cuda toolkit 12.6.1"
 	@wget https://developer.download.nvidia.com/compute/cuda/12.6.1/local_installers/cuda_12.6.1_560.35.03_linux.run && \
@@ -53,8 +52,8 @@ setup-cuda-toolkit: ## setup cuda toolkit
 		rm cuda_12.6.1_560.35.03_linux.run
 	@nvcc --version
 
-.PHONY: setup-cudnn
 # https://developer.nvidia.com/rdp/cudnn-archive
+.PHONY: setup-cudnn
 setup-cudnn: ## setup cudnn
 	@echo "installing cudnn-linux-x86_64-8.9.7.29_cuda12"
 	@sudo apt install -y libcusolver-12 libcusparse-12 libcublas-12
