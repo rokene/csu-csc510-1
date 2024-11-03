@@ -2,13 +2,13 @@ import logging
 
 # dev options
 
-enable_dev_test = True
+enable_dev_test = False
 dev_test_sample_size = 100000   # limits sample size
 dev_test_random_state = 42
 
 # system
 
-force_regenerate_models = True
+force_regenerate_models = False
 
 # logging
 
