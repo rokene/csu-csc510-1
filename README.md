@@ -66,7 +66,7 @@ Execute: `make towers-hanoi`
 
 ### Portfolio Project
 
-Setup Portfolio Project: `make pp`
+Setup Portfolio Project: `make pp-setup`
 
 Execute Portfolio Project: `make pp`
 
